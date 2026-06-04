@@ -1,11 +1,25 @@
 import { Navbar } from '@/components/Navbar';
 import { FeaturedPropertyCard } from '@/components/FeaturedPropertyCard';
 import { PropertyCard } from '@/components/PropertyCard';
-import { mockProperties } from '@/lib/mock-data';
+import { Pagination } from '@/components/Pagination';
+import { getFeaturedProperties, getListingProperties } from '@/lib/properties';
 
-export default function Home() {
-  const featuredProperties = mockProperties.filter(p => p.featured);
-  const newProperties = mockProperties.filter(p => !p.featured);
+const PAGE_SIZE = 6;
+
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+}) {
+  const { page: pageParam } = await searchParams;
+  const currentPage = Math.max(1, parseInt((pageParam as string) ?? '1', 10));
+
+  const [featuredProperties, listingData] = await Promise.all([
+    getFeaturedProperties(),
+    getListingProperties(currentPage, PAGE_SIZE),
+  ]);
+
+  const { properties: listingProperties, totalPages, total } = listingData;
 
   return (
     <>
@@ -73,7 +87,9 @@ export default function Home() {
           <div className="flex items-end justify-between mb-8">
             <div>
               <h2 className="text-2xl font-light text-nordic-dark">New in Market</h2>
-              <p className="text-nordic-muted mt-1 text-sm">Fresh opportunities added this week.</p>
+              <p className="text-nordic-muted mt-1 text-sm">
+                {total} fresh {total === 1 ? 'opportunity' : 'opportunities'} available.
+              </p>
             </div>
             <div className="hidden md:flex bg-white p-1 rounded-lg">
               <button className="px-4 py-1.5 rounded-md text-sm font-medium bg-nordic-dark text-white shadow-sm">All</button>
@@ -81,16 +97,13 @@ export default function Home() {
               <button className="px-4 py-1.5 rounded-md text-sm font-medium text-nordic-muted hover:text-nordic-dark">Rent</button>
             </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {newProperties.map(property => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6">
+            {listingProperties.map(property => (
               <PropertyCard key={property.id} property={property} />
             ))}
           </div>
-          <div className="mt-12 text-center">
-            <button className="px-8 py-3 bg-white border border-nordic-dark/10 hover:border-mosque hover:text-mosque text-nordic-dark font-medium rounded-lg transition-all hover:shadow-md">
-              Load more properties
-            </button>
-          </div>
+
+          <Pagination currentPage={currentPage} totalPages={totalPages} />
         </section>
       </main>
     </>

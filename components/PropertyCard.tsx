@@ -1,4 +1,4 @@
-import { Property } from '@/lib/mock-data';
+import { Property } from '@/lib/properties';
 
 export function PropertyCard({ property }: { property: Property }) {
   const isSale = property.type === 'sale';
@@ -7,7 +7,7 @@ export function PropertyCard({ property }: { property: Property }) {
   return (
     <article className="bg-white rounded-xl overflow-hidden shadow-card hover:shadow-soft transition-all duration-300 group cursor-pointer h-full flex flex-col">
       <div className="relative aspect-[4/3] overflow-hidden">
-        <img alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={property.imageUrl} />
+        <img alt={property.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src={property.image_url ?? ''} />
         <button className="absolute top-3 right-3 p-2 bg-white/90 rounded-full hover:bg-mosque hover:text-white transition-colors text-nordic-dark">
           <span className="material-icons text-lg">favorite_border</span>
         </button>
@@ -20,7 +20,7 @@ export function PropertyCard({ property }: { property: Property }) {
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-baseline mb-2">
           <h3 className="font-bold text-lg text-nordic-dark">
-            {property.formattedPrice?.split('/')[0]}
+            {property.formatted_price?.split('/')[0]}
             {property.type === 'rent' && <span className="text-sm font-normal text-nordic-muted">/mo</span>}
           </h3>
         </div>
